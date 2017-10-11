@@ -1,0 +1,15 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+date	../ex1.py	/^from datetime import date$/;"	kind:namespace	line:2
+day	../ex1.py	/^    day = int(line[1])$/;"	kind:variable	line:10
+days_passed	../ex1.py	/^    days_passed = (xmas - in_date).days$/;"	kind:variable	line:13
+ex1.py	../ex1.py	1;"	kind:file	line:1
+in_date	../ex1.py	/^    in_date = date(2016, month, day)$/;"	kind:variable	line:12
+line	../ex1.py	/^    line = line.split()$/;"	kind:variable	line:7
+month	../ex1.py	/^    month = int(line[0])$/;"	kind:variable	line:9
+sys	../ex1.py	/^import sys$/;"	kind:namespace	line:1
+xmas	../ex1.py	/^xmas = date(2016, 12, 25)$/;"	kind:variable	line:4
