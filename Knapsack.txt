@@ -1,0 +1,824 @@
+/*
+ * UVa 990 Diving for Gold - Knapsack, 3*w constraint, reconstruct solution
+ */
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int t, w;
+
+int depth[300];
+int value[100];
+
+int memo[2000][2000];
+int taken[2000][2000];
+
+int dp(int i, int time) {
+    if (i < 0 || time <= 0) {
+        return 0;
+    }
+
+    if (memo[i][time] != -1) {
+        return memo[i][time];
+    }
+
+    if ((3 * w * depth[i]) > time) {
+        return memo[i][time] = dp(i - 1, time);
+    }
+
+    auto take = dp(i - 1, time - (3 * w * depth[i])) + value[i];
+    auto not_take = dp(i - 1, time);
+
+    if (take > not_take) {
+        taken[i][time] = true;
+        return memo[i][time] = take;
+    }
+    return memo[i][time] = not_take; 
+}
+
+void reconstruct(int nt, int time) {
+    stack<int> items;
+
+    do {
+        if (taken[nt][time]) {
+            time = time - (3 * w * depth[nt]);
+            items.push(nt);
+        }
+    } while (nt--);
+
+    cout << items.size() << endl;
+    while (!items.empty()) {
+        cout << depth[items.top()] << ' ' << value[items.top()] << endl;
+        items.pop();
+    }
+}
+
+int main() {
+    int f = 0;
+    while (cin >> t >> w) {
+        memset(memo, -1, sizeof memo);
+        memset(depth, 0, sizeof depth);
+        memset(value, 0, sizeof value);
+        memset(taken, false, sizeof taken);        
+
+        int nt;
+        cin >> nt;
+
+        int d, v;
+        for (int i = 0; i < nt; i++) {
+            cin >> d >> v;
+            depth[i] = d;
+            value[i] = v;
+        }
+
+        if (f) {
+            cout << endl;
+        }
+        f++;
+
+        cout << dp(nt, t) << endl;
+        reconstruct(nt, t);
+    }
+
+    return 0;
+}
+
+/*
+ * UVa 10130 Supersale - Knapsack, calculate for each member in family
+ */ 
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int N;
+int price[1100];
+int weight[1100];
+int family[110];
+int memo[1100][40];
+
+int dp(int i, int w) {
+    // No items or full bag
+    if (i < 0 || w <= 0) {
+        return 0;
+    }
+
+    // Value already in matrix
+    if (memo[i][w] != -1) {
+        return memo[i][w];
+    }
+
+    // Current item weight greater than bag's capacity. Move to previous item
+    if (weight[i] > w) {
+        return memo[i][w] = dp(i - 1, w);
+    }
+
+    // Choose between not taking or taking the item
+    return memo[i][w] = max(dp(i - 1, w),
+                            dp(i - 1, w - weight[i]) + price[i]);
+}
+
+int main() {
+    int t;
+    cin >> t;
+
+    while (t--) {
+        memset(price, 0, sizeof price);
+        memset(weight, 0, sizeof weight);
+        memset(family, 0, sizeof family);
+
+        int r = 0;
+        cin >> N;
+        int p, w, g;
+
+        for (int i = 0; i < N; i++) {
+            cin >> p >> w;
+            price[i] = p;
+            weight[i] = w;
+        }
+
+        cin >> g;
+
+        for (int i = 0; i < g; i++) {
+            int mw;
+            cin >> mw;
+            family[i] = mw;
+        }
+
+        for (int i = 0; i < g; i++) {
+            memset(memo, -1, sizeof memo);
+            r += dp(N, family[i]);
+        }
+
+        cout << r << endl;
+    }
+
+    return 0;
+}
+
+/*
+ * UVa 10819 13 Dots - Knapsack, built with i = 0 and w = 0, taking in account
+ * weird weight modifications
+ */
+
+#include <bits/stdc++.h>
+
+#define MAX_PRICE 10000
+#define MAX_FAVOUR 500
+#define MAX_ITEMS 100
+
+using namespace std;
+
+int price[MAX_ITEMS];
+int favour[MAX_ITEMS];
+
+int memo[MAX_PRICE][MAX_PRICE];
+int m;
+int n;
+
+int knapsack(int i, int budget) {
+    
+    if (budget > m && m <= 1800) {
+        return -1000;
+    }
+
+    if (budget > m + 200) {
+        return -1000;
+    }
+
+    if (i == n) {
+        if (budget <= 2000 && budget > m) {
+            return -1000;
+        }
+        return 0;
+    }
+
+    if (memo[i][budget] != -1) {
+        return memo[i][budget];
+    }
+
+    return memo[i][budget] = max(knapsack(i + 1, budget),
+                                 knapsack(i + 1, budget + price[i]) + favour[i]);
+}
+
+int main() {
+    while (cin >> m >> n) {
+        memset(memo, -1, sizeof memo);
+
+        int p, f;
+        for (int i = 0; i < n; i++) {
+            cin >> p >> f;
+            price[i] = p;
+            favour[i] = f;
+        }
+        cout << knapsack(0, 0) << endl;
+    }
+
+    return 0;
+}
+
+/*
+ * Dividing coins - Knapsack, weight = value
+ */ 
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int peso[105];
+int valor[105];
+
+int memo[15000][15000];
+
+int c = 0;
+
+int nepseq(int item, int weight) {
+    c++;
+    if (item < 0 || weight <= 0) {
+        return 0;
+    }
+
+    if (memo[item][weight] != -1) {
+        return memo[item][weight];
+    }
+
+    if (peso[item] > weight) {
+        return memo[item][weight] = nepseq(item - 1, weight);
+    }
+
+    return memo[item][weight] = max(nepseq(item - 1, weight),
+                                    nepseq(item - 1, weight - peso[item]) + valor[item]);
+}
+
+int main() {
+    int n;
+    cin >> n;
+
+    while (n--) {
+        memset(memo, -1, sizeof memo);
+        memset(peso, 0, sizeof peso);
+        memset(valor, 0, sizeof valor);
+        int m;
+        int sum = 0;
+        int v;
+        cin >> m;
+
+        for (int i = 0; i < m; i++) {
+            int temp;
+            cin >> temp;
+            peso[i] = temp;
+            valor[i] = temp;
+            sum += temp;
+            cout << "sum: " << sum << endl; 
+        }
+
+        v = nepseq(m, sum / 2);
+        cout << "count: " << c << endl;
+        cout << "maior: " << v << endl;
+        cout << sum - 2 * v << endl;
+    }
+
+    return 0;
+}
+
+/*
+ * Wedding Shop - DP não clássica
+ */
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int memo[200][200];
+vector<int> items[20];
+int M, C;
+
+int dp(int i, int money) {
+    if (money < 0) {
+        return numeric_limits<int>::lowest();
+    }
+
+    if (memo[i][money] != -1) {
+        return memo[i][money];
+    }
+
+    if (i == C) {
+        return M - money;
+    }
+
+    int max_cost = numeric_limits<int>::lowest();
+
+    for (auto item : items[i]) {
+        max_cost = max(max_cost, dp(i + 1, money - item));
+    }
+
+    return memo[i][money] = max_cost;
+}
+
+int main() {
+    int tc;
+
+    cin >> tc;
+
+    while (tc--) {
+        memset(memo, -1, sizeof(memo));
+        int k, p;
+
+        cin >> M >> C;
+        for (int i = 0; i < C; i++) {
+            cin >> k;
+            items[i].clear();
+
+            for (int j = 0; j < k; j++) {
+                cin >> p;
+                items[i].push_back(p);
+            }
+        }
+
+        int cost = dp(0, M);
+
+        if (cost > 0) {
+            cout << cost << endl;
+        } else {
+            cout << "no solution" << endl;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * Testing the CATCHER - LIS, but decreasing instead of increasing 
+ */
+
+#include <bits/stdc++.h>
+
+#define MAX 33000
+
+using namespace std;
+
+// Sequencia original
+int sequence[MAX];
+
+// Registra a LIS (que sempre está ordenada)
+int lis_seq[MAX];
+
+int lis(int n) {
+    int max_lis = 0;
+
+    for (int i = 0; i < n; i++) {
+        lis_seq[i] = 1;
+
+        for (int j = i - 1; j >= 0; j--) {
+            if (sequence[j] >= sequence[i]) {
+                lis_seq[i] = max(lis_seq[i], lis_seq[j] + 1);
+            }
+        }
+
+        max_lis = max(max_lis, lis_seq[i]);
+    }
+
+    return max_lis;
+}
+
+int main() {
+    int i;
+    int tc = 1;
+    int counter = 0;
+
+    while (1) {
+        cin >> i;
+
+        if (i == -1) {
+            cout << "Test #" << tc << ":" << endl;
+            cout << "  maximum possible interceptions: " << lis(counter) << endl;
+            memset(sequence, 0, sizeof sequence);
+            memset(lis_seq, 0, sizeof lis_seq);
+            counter = 0;
+            tc++;
+
+            cin >> i;
+            if (i == -1) {
+                return 0;
+            }
+            cout << endl;
+        }
+        sequence[counter] = i;
+        counter++;
+    }
+
+    return 0;
+}
+
+/*
+ * Tower of Babylon - A reaaally forced LIS. Get all permutations of blocks,
+ * Sort the fuck out of them, compare x and y axis, add z axis on sum.
+ */ 
+
+#include <bits/stdc++.h>
+
+#define MAX 1000
+
+using namespace std;
+
+int memo[MAX];
+
+typedef struct block {
+    int x, y, z;
+
+    block(int a, int b, int c) {
+        x = a; 
+        y = b;
+        z = c;
+    }
+} block;
+
+vector<block> blocks;
+
+bool comp(block a, block b) {
+    if (a.x != b.x) {
+        return a.x < b.x;
+    } else if (a.y != b.y) {
+        return a.y < b.y;
+    }
+    return a.z < b.z;
+}
+
+int lis(int n) {
+    int max_lis = 0;
+    
+    for (int i = 0; i < n; i++) {
+        memo[i] = blocks[i].z;
+
+        for (int j = i - 1; j >= 0; j--) {
+            if (blocks[j].x < blocks[i].x && blocks[j].y < blocks[i].y) {
+                memo[i] = max(memo[i], memo[j] + blocks[i].z);
+            }
+        }
+
+        max_lis = max(max_lis, memo[i]);
+    }
+
+    return max_lis;
+}
+
+int main() {
+    int n;
+    int c = 1;
+
+    cin >> n;
+    
+    while (n != 0) {
+        memset(memo, 0, sizeof memo);
+        blocks.clear();
+
+        int x, y, z;
+
+        for (int i = 0; i < n; i++) {
+            cin >> x >> y >> z;
+            
+            blocks.push_back(block(x, y, z));
+            blocks.push_back(block(x, z, y));
+            blocks.push_back(block(y, x, z));
+            blocks.push_back(block(y, z, x));
+            blocks.push_back(block(z, y, x));
+            blocks.push_back(block(z, x, y));
+        }
+
+        sort(blocks.begin(), blocks.end(), comp);
+
+        cout << "Case " << c << ": maximum height = " << lis(blocks.size()) << endl;
+        c++;
+
+        cin >> n;
+    }
+
+    return 0;
+}
+
+/*
+ * What goes up - Only one that works with nlogn solution somehow. 
+ * Uses reconstruction.
+ */
+
+#include <bits/stdc++.h>
+
+#define MAX 1000000
+
+using namespace std;
+
+int sequence[MAX];
+int lis_seq[MAX];
+
+int lis_seq_i[MAX];
+int lis_parents[MAX];
+int lis_max_i = -1;
+
+int lis(int n) {
+    // Tamanho do lis_seq, inicialmente está vazio
+    int lis_size = 0;
+    
+    for (int i = 0; i < n; ++i) {
+
+        // Encontra a menor posição que é possível inserir o i-ésimo termo na LIS
+        int p = lower_bound(lis_seq, lis_seq + lis_size, sequence[i]) - lis_seq; 
+
+        lis_seq[p] = sequence[i];
+        lis_seq_i[p] = i;
+
+        lis_parents[i] = (p ? lis_seq_i[p - 1] : -1);
+
+        if (p + 1 > lis_size) {
+            lis_size = p + 1;
+            lis_max_i = i;
+        }
+    }
+
+    return lis_size;
+}
+
+void reconstruct() {
+    stack<int> s;
+    for (int i = lis_max_i; i != -1; i = lis_parents[i]) {
+        s.push(sequence[i]);
+    }
+
+    cout << s.top() << endl;
+    while (s.pop(), !s.empty()) {
+        cout << s.top() << endl;
+    }
+}
+
+int main() {
+    int v;
+    int i = 0;
+
+    while (cin >> v) {
+        sequence[i] = v;
+        i++;
+    }
+
+    cout << lis(i) << endl;
+    cout << '-' << endl;
+    reconstruct();
+}
+
+/*
+ * Tiling up blocks - Kinda like tower of babylon, but with less stuff to sort.
+ */ 
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+vector< pair<int, int> > block;
+int memo[11000];
+
+int lis(int n) {
+    int max_lis = 0;
+    
+        for (int i = 0; i < n; i++) {
+            memo[i] = 1;
+    
+            for (int j = i - 1; j >= 0; j--) {
+                if (block[j].second <= block[i].second) {
+                    memo[i] = max(memo[i], memo[j] + 1);
+                }
+            }
+    
+            max_lis = max(max_lis, memo[i]);
+        }
+    
+        return max_lis;
+}
+
+int main() {
+    int b;
+    cin >> b;
+    
+    while (b != 0) {
+        int l, m;
+        pair<int, int> bl;
+
+        memset(memo, 0, sizeof memo);
+        block.clear();
+
+        for (int i = 0; i < b; i++) {
+            cin >> l >> m;
+
+            bl.first = l;
+            bl.second = m;
+
+            block.push_back(bl);
+        }
+
+        sort(block.begin(), block.end());
+
+        cout << lis(b) << endl;
+        cin >> b;
+    }
+
+    cout << '*' << endl;
+
+    return 0;
+}
+
+/*
+ * Forwarding emails - fuck this stupid fucking question in its stupid fucking face
+ * A *really* modified dfs and a bunch of black magic to stop evil cycles or whatever
+ */
+
+#include <bits/stdc++.h>
+
+#define MAX 50005
+#define next iahusd
+
+using namespace std;
+
+int next[MAX];
+int can_reach[MAX];
+bool useless[MAX];
+bool visited[MAX];
+int n;
+
+int dfs(int v) {
+    if (can_reach[v])  {
+        return can_reach[v];
+    }
+
+    return can_reach[v] = dfs(next[v]) + 1;
+}
+
+int main() {
+    int t, u, v;
+    scanf("%d", &t);
+
+    for (int i = 0; i < t; i++) {
+        memset(next, 0, sizeof next);
+        scanf("%d", &n);
+
+        for (int j = 0; j < n; j++) {
+            scanf("%d %d", &u, &v);
+
+            next[u] = v;
+        }
+
+        memset(can_reach, 0, sizeof can_reach);
+        memset(visited, false, sizeof visited);
+        memset(useless, false, sizeof useless);
+
+        for (int j = 1; j <= n; j++) {
+            if (!visited[j]) {
+                int node = j;
+
+                while (!visited[node]) {
+                    visited[node] = true;
+                    node = next[node];
+                }
+
+                if (!useless[node]) {
+                    int cycle_st = node;
+                    int cycle_sz = 0;
+
+                    do {
+                        node = next[node];
+                        cycle_sz++;
+                    } while (node != cycle_st);
+
+                    cycle_st = node;
+                    do {
+                        can_reach[node] = cycle_sz;
+                        node = next[node];
+                    } while (node != cycle_st);
+                }
+
+                node = j;
+                while (!useless[node]) {
+                    useless[node] = true;
+                    node = next[node];
+                }
+            }
+        }
+
+        int max_value = 0;
+        int result = 0;
+
+        for (int j = 1; j <= n; j++) {
+            dfs(j);
+            if (can_reach[j] > max_value) {
+                max_value = can_reach[j];
+                result = j;
+            }
+        }
+        printf("Case %d: %d\n", i + 1, result);
+        
+    }
+
+    return 0;
+}
+
+/*
+ * URI 1317
+ * I hate spam, but some people love it - I hate graphs, and I guess everyone else does too.
+ * Use BFS, count amount of neighbors for each visited node, use this amount to calculate
+ * the spam result for each person.
+ */ 
+
+#include <bits/stdc++.h>
+#define MAX_P 20
+#define MAX_SP 100
+
+using namespace std;
+
+vector<int> graph[MAX_P];
+string spam[MAX_SP][3];
+int spammer[MAX_SP];
+pair<int, int> thr[MAX_SP];
+string people[MAX_P];
+bool visited[MAX_P];
+string results[MAX_P][MAX_SP];
+
+void bfs(int s, int c) {
+    memset(visited, 0, sizeof visited);
+
+    int initial_vertice = s;
+
+    queue<int> to_visit;
+    to_visit.push(initial_vertice);
+    visited[initial_vertice] = true;
+
+    while (!to_visit.empty()) {
+        auto v = to_visit.front();
+        to_visit.pop();
+
+        for (auto i : graph[v]) {
+            if (!visited[i]) {
+                visited[i] = true;
+                to_visit.push(i);
+            }
+        }
+
+        int list_s = graph[v].size();
+        if (list_s < thr[c].first) {
+            results[v][c] = spam[c][0];
+        } else if (list_s >= thr[c].first && list_s < thr[c].second) {
+            results[v][c] = spam[c][1];
+        } else {
+            results[v][c] = spam[c][2];
+        }
+    }
+}
+
+int main() {
+    int n;
+    
+    while (cin >> n, n != 0) {
+        for (int i = 1; i <= n; i++) {
+            graph[i].clear();
+            int p;
+            while (cin >> p, p != 0) {
+                graph[i].push_back(p);
+            }
+        }
+
+        int sp, t1, t2;
+        int c = 0;
+        string a1, a2, a3;
+        while (cin >> sp , sp != 0) {
+            cin >> t1 >> t2 >> a1 >> a2 >> a3;
+            pair<int, int> t (t1, t2);
+            spammer[c] = sp;
+            thr[c] = t;
+            spam[c][0] = a1;
+            spam[c][1] = a2;
+            spam[c][2] = a3;
+            c++;
+        }
+        
+        for (int i = 1; i <= n; i++) {
+            string per;
+            cin >> per;
+            people[i] = per;
+        }
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j < c; j++) {
+                results[i][j] = spam[j][0];
+            }
+        }
+
+        for (int i = 0; i < c; i++) {
+            bfs(spammer[i], i);
+        }
+
+        for (int i = 1; i <= n; i++) {
+            cout << people[i] << ": ";
+            for (int j = 0; j < c; j++) {
+                cout << results[i][j] << ' ';
+            }
+            cout << endl;
+        }
+    }
+}
+
