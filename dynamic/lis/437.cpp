@@ -1,3 +1,8 @@
+/*
+ * Tower of Babylon - A reaaally forced LIS. Get all permutations of blocks,
+ * Sort the fuck out of them, compare x and y axis, add z axis on sum.
+ */ 
+
 #include <bits/stdc++.h>
 
 #define MAX 1000

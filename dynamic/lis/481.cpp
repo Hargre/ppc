@@ -1,3 +1,8 @@
+/*
+ * What goes up - Only one that works with nlogn solution somehow. 
+ * Uses reconstruction.
+ */
+
 #include <bits/stdc++.h>
 
 #define MAX 1000000

@@ -1,3 +1,7 @@
+/*
+ * UVa 990 Diving for Gold - Knapsack, 3*w constraint, reconstruct solution
+ */
+
 #include <bits/stdc++.h>
 
 using namespace std;

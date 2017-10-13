@@ -1,3 +1,8 @@
+/*
+ * UVa 10819 13 Dots - Knapsack, built with i = 0 and w = 0, taking in account
+ * weird weight modifications
+ */
+
 #include <bits/stdc++.h>
 
 #define MAX_PRICE 10000

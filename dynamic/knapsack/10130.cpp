@@ -1,3 +1,7 @@
+/*
+ * UVa 10130 Supersale - Knapsack, calculate for each member in family
+ */ 
+
 #include <bits/stdc++.h>
 
 using namespace std;

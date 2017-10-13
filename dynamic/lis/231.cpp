@@ -1,3 +1,7 @@
+/*
+ * Testing the CATCHER - LIS, but decreasing instead of increasing 
+ */
+
 #include <bits/stdc++.h>
 
 #define MAX 33000

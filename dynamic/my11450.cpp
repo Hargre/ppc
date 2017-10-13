@@ -1,3 +1,7 @@
+/*
+ * Wedding Shop - DP não clássica
+ */
+
 #include <bits/stdc++.h>
 
 using namespace std;

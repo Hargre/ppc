@@ -1,3 +1,8 @@
+/*
+ * Forwarding emails - fuck this stupid fucking question in its stupid fucking face
+ * A *really* modified dfs and a bunch of black magic to stop evil cycles or whatever
+ */
+
 #include <bits/stdc++.h>
 
 #define MAX 50005
