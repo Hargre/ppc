@@ -1,22 +1,18 @@
 #include <bits/stdc++.h>
 
-#define UNVISITED -1
-#define MAX_V 25
-
 using namespace std;
 
-unordered_map<string, vector<string>> G;
+map<char, vector<char>> G;
+map<char, int> dfs_num;
+map<char, int> dfs_low;
+map<char, bool> visited;
 
-unordered_map<string, int> dfs_num;
-unordered_map<string, int> dfs_low;
-unordered_map<string, bool> visited;
-
-vector<string> scc;
+vector<char> scc;
 
 int dfs_count = 0;
 int scc_count = 0;
 
-void tarjan_scc(string v) {
+void tarjan_scc(int v) {
     dfs_num[v] = dfs_low[v] = dfs_count++;
     scc.push_back(v);
     visited[v] = true;
@@ -36,36 +32,37 @@ void tarjan_scc(string v) {
             scc.pop_back();
             visited[i] = false;
 
-            cout << i << " ";
+            cout << " " << i;
         } while(i != v);
 
         printf("\n");
     }
 }
 
-
 int main() {
+    int n;
+    char v;
 
-    int n, m;
-    string caller;
-    string called;
-
-    while (cin >> n >> m, n) {
-        dfs_count = scc_count = 0;
+    while (cin >> n, n) {
         G.clear();
         dfs_num.clear();
         dfs_low.clear();
         visited.clear();
 
-        for (int i = 0; i < m; i++) {
-            cin >> caller >> called;
-            G[caller].push_back(called);
+        char aux[5];
+
+        for (int i = 0; i < 5; i++) {
+            cin >> aux[i];
+        }
+
+        cin >> v;
+
+        for (int i = 0; i < 5; i++) {
+            if (v != aux[i]) G[v].push_back(aux[i]);
         }
 
         for (auto i : G) {
-            if (dfs_num.find(i.first) == dfs_num.end()) {
-                tarjan_scc(i.first);
-            }
+            if (dfs_num.find(i.first) == dfs_num.end()) tarjan_scc(i.first);
         }
     }
 
